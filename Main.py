@@ -11,6 +11,12 @@ from scipy.stats.mstats import normaltest
 from sklearn.grid_search import GridSearchCV
 
 
+def write(datadf, path, tab="Sheet1"):
+    WRITE_PATH = path
+    writer = pd.ExcelWriter(WRITE_PATH, engine='xlsxwriter')
+    datadf.to_excel(writer, sheet_name=tab)
+    writer.save()
+
 
 def getBlendedSignal(data,ml_model, gap=60,**kwargs):
     #@FORMAT: data = df(Y,X1,X2...,index=dates), dates goes from earliest to latest
@@ -111,9 +117,11 @@ data = data.dropna()
 
 input = data.drop(['Open'], axis=1)
 print(input)
-fcsts = getBlendedSignal(input, DTR, gap=20)
+fcsts = getBlendedSignal(input, DTR, gap=10)
+fcsts = pd.DataFrame(fcsts, columns=['date', 'Y', 'Y_Pred'])
 print('fcsts', pd.DataFrame(fcsts))
 
+write(fcsts, 'DTR_Results_10.xlsx','sheet1')
 
 
 params_svc_lin = [{'kernel':['linear'],'C':[1,10,50,100]}]
